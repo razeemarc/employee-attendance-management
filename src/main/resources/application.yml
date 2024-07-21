@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: employee-attendance
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:orcl
+    username: sys as sysdba
+    password: Razeema@2002
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+
+jwt:
+  secret:
+    key: 54ed7467f6a43a73b35528e42f24112f683048b4b22ff6bcf1b8bb9dc22aada8
