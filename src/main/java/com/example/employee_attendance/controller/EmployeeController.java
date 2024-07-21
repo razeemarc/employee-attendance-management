@@ -29,13 +29,17 @@ public class EmployeeController {
 
     @PostMapping("/register")
     public JwtResponse registerEmployee(@RequestBody Employee employee) {
-        employeeService.registerEmployee(employee);
+        try {
+            employeeService.registerEmployee(employee);
 
-        // Generate a token after successful registration
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(employee.getUsername());
-        final String token = jwtUtil.generateToken(userDetails.getUsername());
+            // Generate a token after successful registration
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(employee.getUsername());
+            final String token = jwtUtil.generateToken(userDetails.getUsername());
 
-        return new JwtResponse(token);
+            return new JwtResponse(token);
+        } catch (Exception e) {
+            return new JwtResponse(e.getMessage());  // Adjust the response as needed
+        }
     }
 
     @PostMapping("/authenticate")
