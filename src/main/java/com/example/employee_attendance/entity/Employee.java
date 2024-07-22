@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -23,7 +22,7 @@ public class Employee {
     private boolean present;
 
     private Double baseSalary;  // Added baseSalary field
-
+    private Double onedaySalary;
     private String role;  // Added role field
 
     // Getters and setters
