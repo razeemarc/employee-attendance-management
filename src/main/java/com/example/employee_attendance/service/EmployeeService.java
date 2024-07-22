@@ -1,7 +1,9 @@
 package com.example.employee_attendance.service;
 
 import com.example.employee_attendance.entity.Employee;
+import com.example.employee_attendance.entity.LoginDetails;
 import com.example.employee_attendance.repository.EmployeeRepository;
+import com.example.employee_attendance.repository.LoginDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
+    private LoginDetailsRepository loginDetailsRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public void registerEmployee(Employee employee) throws Exception {
@@ -24,8 +29,6 @@ public class EmployeeService {
         if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
             throw new Exception("Email is already in use");
         }
-
-        // Encode the password before saving
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employee.setLoginTime(null);
         employee.setPresent(false);
@@ -35,9 +38,19 @@ public class EmployeeService {
     public void updateLoginTimeAndPresent(String username) {
         Employee employee = employeeRepository.findByUsername(username);
         if (employee != null) {
-            employee.setLoginTime(LocalDateTime.now());
+            LocalDateTime currentTime = LocalDateTime.now();
+            employee.setLoginTime(currentTime);
             employee.setPresent(true);
             employeeRepository.save(employee);
+
+            // Save login details
+            LoginDetails loginDetails = new LoginDetails();
+            loginDetails.setName(employee.getUsername());
+            loginDetails.setEmail(employee.getEmail());
+            loginDetails.setLoginTime(currentTime);
+            loginDetails.setPresent(true);
+            loginDetails.setEmployee(employee);
+            loginDetailsRepository.save(loginDetails);
         }
     }
 }

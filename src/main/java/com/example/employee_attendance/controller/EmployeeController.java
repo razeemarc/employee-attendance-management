@@ -35,9 +35,8 @@ public class EmployeeController {
             // Generate a token after successful registration
             final UserDetails userDetails = userDetailsService.loadUserByUsername(employee.getUsername());
             final String token = jwtUtil.generateToken(userDetails.getUsername());
-            final String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername());
 
-            return new JwtResponse(token, refreshToken);
+            return new JwtResponse(token);
         } catch (Exception e) {
             return new JwtResponse(e.getMessage());  // Adjust the response as needed
         }
@@ -51,19 +50,8 @@ public class EmployeeController {
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
         final String token = jwtUtil.generateToken(userDetails.getUsername());
-        final String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername());
         employeeService.updateLoginTimeAndPresent(jwtRequest.getUsername());
 
-        return new JwtResponse(token, refreshToken);
-    }
-
-    @PostMapping("/refresh")
-    public JwtResponse refreshToken(@RequestBody JwtRequest jwtRequest) throws Exception {
-        // This endpoint should also be used to issue new access tokens
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
-        final String token = jwtUtil.generateToken(userDetails.getUsername());
-        final String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername());
-
-        return new JwtResponse(token, refreshToken);
+        return new JwtResponse(token);
     }
 }
