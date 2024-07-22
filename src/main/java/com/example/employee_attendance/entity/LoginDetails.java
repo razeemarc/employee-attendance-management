@@ -14,6 +14,7 @@ public class LoginDetails {
 
     private String name;
     private String email;
+
     private LocalDateTime loginTime;
     private boolean present;
 

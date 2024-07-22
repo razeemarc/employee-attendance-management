@@ -22,5 +22,9 @@ public class Employee {
     private LocalDateTime loginTime;
     private boolean present;
 
+    private Double baseSalary;  // Added baseSalary field
+
+    private String role;  // Added role field
+
     // Getters and setters
 }
