@@ -9,6 +9,11 @@ spring:
     username: sys as sysdba
     password: Razeema@2002
     driver-class-name: oracle.jdbc.driver.OracleDriver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
 jwt:
   secret:

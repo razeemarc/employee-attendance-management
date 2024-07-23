@@ -1,5 +1,6 @@
 package com.example.employee_attendance.controller;
 
+import com.example.employee_attendance.entity.Accounts;
 import com.example.employee_attendance.entity.Employee;
 import com.example.employee_attendance.models.JwtRequest;
 import com.example.employee_attendance.models.JwtResponse;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 @RestController
 public class EmployeeController {
 
@@ -32,26 +34,30 @@ public class EmployeeController {
         try {
             employeeService.registerEmployee(employee);
 
-            // Generate a token after successful registration
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(employee.getUsername());
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(employee.getEmail());
             final String token = jwtUtil.generateToken(userDetails.getUsername());
 
             return new JwtResponse(token);
         } catch (Exception e) {
-            return new JwtResponse(e.getMessage());  // Adjust the response as needed
+            return new JwtResponse(e.getMessage());
         }
     }
 
     @PostMapping("/authenticate")
     public JwtResponse createAuthenticationToken(@RequestBody JwtRequest jwtRequest) throws Exception {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword())
         );
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getEmail());
         final String token = jwtUtil.generateToken(userDetails.getUsername());
-        employeeService.updateLoginTimeAndPresent(jwtRequest.getUsername());
+        employeeService.updateLoginTimeAndPresent(jwtRequest.getEmail());
 
         return new JwtResponse(token);
+    }
+
+    @GetMapping("/accounts")
+    public List<Accounts> getAllAccounts() {
+        return employeeService.getAllAccounts();
     }
 }

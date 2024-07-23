@@ -2,23 +2,21 @@ package com.example.employee_attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class LoginDetails {
+public class Accounts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String email;
-
-    private LocalDateTime loginTime;
-    private boolean present;
-
     @ManyToOne
-    @JoinColumn(name = "employee_id")
+    @JoinColumn(name = "employee_Id")
     private Employee employee;
+    private int year;
+    private int month;
+    private Double salary;
+
+    // Getters and setters
 }

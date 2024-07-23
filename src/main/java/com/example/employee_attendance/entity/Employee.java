@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Employee {
 
     @Id
-    private Long id;
+    private Long empId; // Manual ID assignment
 
     @Column(unique = true)
     private String username;
@@ -18,12 +18,11 @@ public class Employee {
     private String email;
 
     private String password;
-    private LocalDateTime loginTime;
-    private boolean present;
-
-    private Double baseSalary;  // Added baseSalary field
+    private LocalDateTime loginDate;
+    private Integer presentDays; // Changed to Integer
+    private Double baseSalary;
     private Double onedaySalary;
-    private String role;  // Added role field
+    private String role;
 
     // Getters and setters
 }

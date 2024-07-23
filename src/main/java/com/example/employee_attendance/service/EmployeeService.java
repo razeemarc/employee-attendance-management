@@ -1,14 +1,16 @@
 package com.example.employee_attendance.service;
 
+import com.example.employee_attendance.entity.Accounts;
 import com.example.employee_attendance.entity.Employee;
-import com.example.employee_attendance.entity.LoginDetails;
+import com.example.employee_attendance.repository.AccountsRepository;
 import com.example.employee_attendance.repository.EmployeeRepository;
-import com.example.employee_attendance.repository.LoginDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeService {
@@ -17,7 +19,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private LoginDetailsRepository loginDetailsRepository;
+    private AccountsRepository accountsRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -30,27 +32,46 @@ public class EmployeeService {
             throw new Exception("Email is already in use");
         }
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        employee.setLoginTime(null);
-        employee.setPresent(false);
+        employee.setLoginDate(null);
+        employee.setPresentDays(0);
         employeeRepository.save(employee);
     }
 
-    public void updateLoginTimeAndPresent(String username) {
-        Employee employee = employeeRepository.findByUsername(username);
+    public void updateLoginTimeAndPresent(String email) {
+        Employee employee = employeeRepository.findByEmail(email).orElse(null);
         if (employee != null) {
             LocalDateTime currentTime = LocalDateTime.now();
-            employee.setLoginTime(currentTime);
-            employee.setPresent(true);
+            employee.setLoginDate(currentTime);
+            employee.setPresentDays(employee.getPresentDays() + 1);
             employeeRepository.save(employee);
 
-            // Save login details
-            LoginDetails loginDetails = new LoginDetails();
-            loginDetails.setName(employee.getUsername());
-            loginDetails.setEmail(employee.getEmail());
-            loginDetails.setLoginTime(currentTime);
-            loginDetails.setPresent(true);
-            loginDetails.setEmployee(employee);
-            loginDetailsRepository.save(loginDetails);
+            // Update or create an account record
+            updateAccounts(employee);
         }
+    }
+
+    // Update or create account records for the employee
+    public void updateAccounts(Employee employee) {
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+
+        double salary = employee.getOnedaySalary() * employee.getPresentDays();
+
+        Accounts account = accountsRepository.findByEmployeeAndYearAndMonth(employee, year, month);
+
+        if (account == null) {
+            account = new Accounts();
+            account.setEmployee(employee);
+            account.setYear(year);
+            account.setMonth(month);
+        }
+
+        account.setSalary(salary);
+        accountsRepository.save(account);
+    }
+
+    public List<Accounts> getAllAccounts() {
+        return accountsRepository.findAll();
     }
 }
